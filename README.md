@@ -106,3 +106,51 @@ que obtém um JSON no seguinte formato:
 	"edited": "2014-12-21T20:48:04.175778Z",
 	"url": "https://swapi.co/api/planets/1/"
 }
+
+**Scripts de banco**
+
+No PostgreSQL, criar um usuário "starwars", com senha "starwars". Depois, criar um database "starwars", cujo owner é "starwars".
+
+CREATE ROLE starwars WITH
+  LOGIN
+  NOSUPERUSER
+  NOINHERIT
+  CREATEDB
+  NOCREATEROLE
+  NOREPLICATION;
+
+CREATE DATABASE starwars
+    WITH 
+    OWNER = starwars
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Portuguese_Brazil.1252'
+    LC_CTYPE = 'Portuguese_Brazil.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+Depois disso, no database "starwars", criar a tabela "planet":
+
+CREATE TABLE public.planet
+(
+    id bigint NOT NULL,
+    name character varying COLLATE pg_catalog."default" NOT NULL,
+    climate character varying COLLATE pg_catalog."default",
+    terrain character varying COLLATE pg_catalog."default",
+    CONSTRAINT planet_pk PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.planet
+    OWNER to postgres;
+
+GRANT ALL ON TABLE public.planet TO postgres;
+
+GRANT ALL ON TABLE public.planet TO starwars;
+
+CREATE UNIQUE INDEX planet_name_idx
+    ON public.planet USING btree
+    (name COLLATE pg_catalog."default")
+    TABLESPACE pg_default;
